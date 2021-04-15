@@ -1,6 +1,8 @@
 # payloadGo
 an library to add payload to file
 
+perfect to have a configuration or data embedded in the binary
+
 ## Usage
 
 ```
