@@ -40,12 +40,15 @@ func deletePayload(file *os.File, fileInfo os.FileInfo, path string  ) (int,stri
     return 200,"delete"
 }
 
-func putPayload(path string, payload string, file *os.File, fileInfo os.FileInfo) (int,string){
+func putPayload(path string, payload string ) (int,string){
+  f, err := os.OpenFile(path,os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+  if err != nil { fmt.Println(err) }
+
+  file:=getFile(path)
+  fileInfo:=getFileInfo(path)
   lengthPayload  := getLengthPayload(file, fileInfo)
   if lengthPayload != 0 { deletePayload(file, fileInfo,path)  }
 
-  f, err := os.OpenFile(path,os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-  if err != nil { fmt.Println(err) }
 
   defer f.Close()
   if _, err := f.WriteString(payload+fmt.Sprintf("%08d", len(payload))+"\n"); err != nil {
@@ -60,7 +63,7 @@ func getPayload(path string,  file *os.File, fileInfo os.FileInfo, lengthPayload
     } else {
     bufPayload := make([]byte, lengthPayload) //on met la taille du payload en int
     file.ReadAt(bufPayload, fileInfo.Size() - int64(9) - int64(lengthPayload) )
-    return 200, "okey", string(bufPayload[:len(bufPayload)-1])
+    return 200, "okey", string(bufPayload)
    }
 
 }
@@ -87,7 +90,7 @@ func PUT(path string, payload string) response{
   }
   if payload == "" { payload = "\ndefaultPayload:\n\t- key1: false\n"}
 
-  status_code, message :=  putPayload(path,payload,getFile(path),getFileInfo(path))
+  status_code, message :=  putPayload(path,payload)
   return response{"PUT","path: "+path+" Payload: "+payload,status_code,message,""}
 }
 
