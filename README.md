@@ -1,4 +1,4 @@
-# payloadGO
+# payloadGo
 an library to add payload to file
 
 ## Usage
