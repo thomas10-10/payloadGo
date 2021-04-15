@@ -11,18 +11,6 @@ func getSelfPath() (path string) {
   return path
 }
 
-func getFile(path string) (file *os.File){
-	file, err := os.Open(path)
-	if err != nil { panic(err) }
-  return file
-}
-
-func getFileInfo(path string) (fileInfo os.FileInfo){
-  fileInfo, err := os.Stat(path)
-	if err != nil { panic(err) }
-  return fileInfo
-}
-
 func getLengthPayload(file *os.File, fileInfo os.FileInfo ) (lengthPayload int)  {
 //get length payload and bytes->string->int from file
   bufLenPayload := make([]byte, 8) //creation d'un array de 8 octets pour stocker nos 8 caracteres 00000000 qui est la taille de  notre payload
@@ -44,8 +32,13 @@ func putPayload(path string, payload string ) (int,string){
   f, err := os.OpenFile(path,os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
   if err != nil { fmt.Println(err) }
 
-  file:=getFile(path)
-  fileInfo:=getFileInfo(path)
+	file, err := os.Open(path)
+	if err != nil { panic(err) }
+  fileInfo, err := os.Stat(path)
+	if err != nil { panic(err) }
+
+//  file:=getFile(path)
+//  fileInfo:=getFileInfo(path)
   lengthPayload  := getLengthPayload(file, fileInfo)
   if lengthPayload != 0 { deletePayload(file, fileInfo,path)  }
 
@@ -80,7 +73,13 @@ func DELETE(path string) response{
   if path == "" {
     path = getSelfPath()
   }
-  status_code, message := deletePayload(getFile(path),getFileInfo(path), path)
+
+	file, err := os.Open(path)
+	if err != nil { return response{"DELETE","path: "+path,404,"inexistent or empty file",""} }
+  fileInfo, err := os.Stat(path)
+	if err != nil {  return response{"DELETE","path: "+path,404,"inexistent or empty file",""} }
+
+  status_code, message := deletePayload(file,fileInfo, path)
   return response{"DELETE","path: "+path,status_code,message,""}
 }
 
@@ -99,16 +98,12 @@ func GET(path string) response{
     path = getSelfPath()
   }
 
-  status_code, message, data := getPayload(path,getFile(path),getFileInfo(path),getLengthPayload(getFile(path),getFileInfo(path)))
+	file, err := os.Open(path)
+	if err != nil { return response{"GET","path: "+path,404,"inexistent or empty file",""} }
+  fileInfo, err := os.Stat(path)
+	if err != nil {  return response{"GET","path: "+path,404,"inexistent or empty file",""} }
+
+  status_code, message, data := getPayload(path,file,fileInfo,getLengthPayload(file,fileInfo))
   return response{"GET","path: "+path,status_code,message,data}
 }
 
-
-
-//func main(){
-//  log.Printf("%+v\n", GET(""))
-//  log.Printf("%+v\n", PUT("","ddddddd"))
-//  log.Printf("%+v\n", GET(""))
-//  log.Printf("%+v\n", DELETE(""))
-//  log.Printf("%+v\n", GET(""))
-//}
