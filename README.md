@@ -14,7 +14,7 @@ import (
 ### payloadGo.PUT(path string,payload string)
 Adds a payload on the file given in path, if the path is "" then the payload will be added on the binary that has been launched. If a payload already exists then it will be replaced
 
-### payloadGo.GET(path string).DATA
+### payloadGo.GET(path string).Data
 If the path is "" then return the payload of the binary that has been launched
 
 ### payloadGo.DELETE(path string)
