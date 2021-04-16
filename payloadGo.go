@@ -62,11 +62,11 @@ func getPayload(path string,  file *os.File, fileInfo os.FileInfo, lengthPayload
 }
 
 type response struct {
-    REQUEST_METHOD string
-    PARAMETERS string
-    STATUS_CODE int
-    STATUS_MESSAGE string
-    DATA string
+    Request_method string
+    Parameters string
+    Status_code int
+    Status_message string
+    Data string
 }
 
 func DELETE(path string) response{
